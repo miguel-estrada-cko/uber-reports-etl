@@ -1,2 +1,2 @@
 export * from './writers/ConsoleWriter'
-export * from './writers/FileWriter'
+export * from './writers/FileBatchWriter'
