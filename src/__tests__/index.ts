@@ -1,0 +1,1 @@
+export { assertImplementsInterface } from './assertImplementsInterface'

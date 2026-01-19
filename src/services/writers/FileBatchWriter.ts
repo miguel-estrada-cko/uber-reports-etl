@@ -3,7 +3,7 @@ import { promises as fs } from 'fs'
 import { dirname } from 'path'
 import { createError } from '../../utils'
 
-export class FileWriter implements WriterInterface {
+export class FileBatchWriter implements WriterInterface {
     private filePath: string
     private tmpFilePath: string
     private lines: string[] = []

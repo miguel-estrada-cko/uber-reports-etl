@@ -3,8 +3,8 @@ import fs, { ReadStream } from 'fs'
 import path from 'path'
 import { createError, generateSettlementBreakdownRows, GenerateSettlementBreakdownRowsMetrics } from '../utils'
 import { stringify } from 'csv-stringify/sync'
-import { CkoSettlementBreakdownReport, Float, FloatDecimal, UberSettlementBreakdownColumns } from '../types'
-import { ConsoleWriter, FileWriter } from '../services'
+import { CkoSettlementBreakdownReport, FloatDecimal, UberSettlementBreakdownColumns } from '../types'
+import { ConsoleWriter, FileBatchWriter, WriterInterface } from '../services'
 
 /**
  * Job
@@ -32,8 +32,8 @@ const main = async (): Promise<void> => {
         }
 
         // Prepare the writer
-        //const reportWriter = new ConsoleWriter()
-        const reportWriter = new FileWriter(`${filePath}-output.csv`)
+        //const reportWriter: WriterInterface = new ConsoleWriter()
+        const reportWriter: WriterInterface = new FileBatchWriter(`${filePath}-output.csv`)
         await reportWriter.open()
 
         // Columns

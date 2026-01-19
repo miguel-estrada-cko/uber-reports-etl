@@ -1,4 +1,4 @@
-import { createError } from '../../utils'
+import { createError } from '../../../utils'
 
 describe('createError util', () => {
     it('should return same Error instance provided', () => {
@@ -29,7 +29,7 @@ describe('createError util', () => {
     })
 
     it('should create Error from bigint', () => {
-        const input = BigInt(9007199254741991)
+        const input = BigInt(9007199254741991n)
         const error = createError(input)
         expect(error).toBeInstanceOf(Error)
         expect(error.message).toBe(String(input))
