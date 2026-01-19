@@ -14,7 +14,6 @@ describe('stringToDate util', () => {
         const input = '2024-01-01T12:00:00'
         const date = stringToDate(input)
 
-        console.log(date)
         expect(date).toBeInstanceOf(Date)
         expect(date).not.toBeNull()
         expect(date?.toISOString()).toBe(new Date(`${input}Z`).toISOString())
