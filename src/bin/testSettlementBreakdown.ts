@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import fs, { ReadStream } from 'fs'
 import path from 'path'
-import readline from 'readline'
 import { createError, generateSettlementBreakdownRows, GenerateSettlementBreakdownRowsMetrics } from '../utils'
 import { stringify } from 'csv-stringify/sync'
 import { CkoSettlementBreakdownReport, Float, FloatDecimal, UberSettlementBreakdownColumns } from '../types'
