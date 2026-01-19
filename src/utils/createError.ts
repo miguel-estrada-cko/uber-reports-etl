@@ -1,3 +1,9 @@
+/**
+ * A utility function to create an Error object from various types of exceptions
+ *
+ * @param exception
+ * @returns
+ */
 export const createError = (exception: unknown): Error => {
     let error: Error
 
