@@ -77,7 +77,7 @@ const CkoSettlementBreakdownAggregationColumns = [
 export async function* generateSettlementBreakdownRows(
     settlementBreakdownReport: CkoSettlementBreakdownReport
 ): AsyncGenerator<UberSettlementBreakdownRecord> {
-    const fileStream = Readable.from(settlementBreakdownReport.FileBuffer).pipe(
+    const fileStream = Readable.from(settlementBreakdownReport.FileStream).pipe(
         parse({ columns: true, trim: true, delimiter: ',' })
     )
 

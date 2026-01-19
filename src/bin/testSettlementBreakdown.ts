@@ -27,7 +27,7 @@ const main = async (): Promise<void> => {
         const fileStream: ReadStream = fs.createReadStream(filePath, { encoding: 'utf-8' })
         const settlementBreakdownReport: CkoSettlementBreakdownReport = {
             Date: new Date(), // TODO: this date needs to come either from the file name, or deducted from the rows
-            FileBuffer: fileStream,
+            FileStream: fileStream,
         }
 
         // Prepare the writer
