@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 import fs, { ReadStream } from 'fs'
 import path from 'path'
-import { createError, generateSettlementBreakdownRows } from '../utils'
+import readline from 'readline'
+import { createError, generateSettlementBreakdownRows, GenerateSettlementBreakdownRowsMetrics } from '../utils'
 import { stringify } from 'csv-stringify/sync'
 import { CkoSettlementBreakdownReport, Float, FloatDecimal, UberSettlementBreakdownColumns } from '../types'
 import { ConsoleWriter, FileWriter } from '../services'
@@ -10,6 +11,7 @@ import { ConsoleWriter, FileWriter } from '../services'
  * Job
  */
 const main = async (): Promise<void> => {
+    console.time()
     const [, , fileName] = process.argv
 
     try {
@@ -41,12 +43,12 @@ const main = async (): Promise<void> => {
             header,
         }))
 
-        const columnsLine = stringify([], { header: true, columns: uberSettlementBreakdownColumns }).trim()
-
-        await reportWriter.write(columnsLine)
+        const columns = stringify([], { header: true, columns: uberSettlementBreakdownColumns }).trim()
+        await reportWriter.write(columns)
 
         // Get the rows from the generator
-        for await (const row of generateSettlementBreakdownRows(settlementBreakdownReport)) {
+        const generatorMetrics: GenerateSettlementBreakdownRowsMetrics = { rowsIn: 0, rowsOut: 0 }
+        for await (const row of generateSettlementBreakdownRows(settlementBreakdownReport, generatorMetrics)) {
             const line = stringify([row], {
                 header: false,
                 columns: uberSettlementBreakdownColumns,
@@ -62,12 +64,16 @@ const main = async (): Promise<void> => {
         // Close the writer
         await reportWriter.close()
 
-        console.log('...done!')
+        console.log(
+            `OK, input: ${fileName}, ${generatorMetrics.rowsIn.toLocaleString()} rows read, ${generatorMetrics.rowsOut.toLocaleString()} rows written`
+        )
     } catch (e: unknown) {
         const error: Error = createError(e)
 
         console.log(error.message)
         process.exit(1)
+    } finally {
+        console.timeEnd()
     }
 }
 

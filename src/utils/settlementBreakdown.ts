@@ -74,8 +74,14 @@ const CkoSettlementBreakdownAggregationColumns = [
     'ReserveInHoldingCurrency',
 ] as const satisfies readonly (keyof UberSettlementBreakdownRecord)[]
 
+export interface GenerateSettlementBreakdownRowsMetrics {
+    rowsIn: number
+    rowsOut: number
+}
+
 export async function* generateSettlementBreakdownRows(
-    settlementBreakdownReport: CkoSettlementBreakdownReport
+    settlementBreakdownReport: CkoSettlementBreakdownReport,
+    generatorMetrics: GenerateSettlementBreakdownRowsMetrics
 ): AsyncGenerator<UberSettlementBreakdownRecord> {
     const fileStream = Readable.from(settlementBreakdownReport.FileStream).pipe(
         parse({ columns: true, trim: true, delimiter: ',' })
@@ -114,6 +120,8 @@ export async function* generateSettlementBreakdownRows(
 
     // Read the file line by line
     for await (const row of fileStream) {
+        generatorMetrics.rowsIn++
+
         const record = normalizeSettlementBreakdownRow(row)
 
         if (!firstRow) {
@@ -142,6 +150,7 @@ export async function* generateSettlementBreakdownRows(
                 NetInProcessingCurrency: record.NetInHoldingCurrency?.div(record.FxRateApplied ?? 1) as Float,
             }
 
+            generatorMetrics.rowsOut++
             yield uberRecord
         } else {
             if (!adjustmentRow.PayoutId) {
@@ -170,6 +179,7 @@ export async function* generateSettlementBreakdownRows(
 
     // Adjustment row
     if (adjustmentRow.PayoutId) {
+        generatorMetrics.rowsOut++
         yield {
             ClientEntityId: firstRow.ClientEntityId || '',
             ClientEntityName: firstRow.ClientEntityName || '',
@@ -223,6 +233,7 @@ export async function* generateSettlementBreakdownRows(
 
     // Payout row
     if (payoutRow.PayoutId) {
+        generatorMetrics.rowsOut++
         yield {
             ClientEntityId: firstRow.ClientEntityId || '',
             ClientEntityName: firstRow.ClientEntityName || '',
@@ -273,4 +284,6 @@ export async function* generateSettlementBreakdownRows(
             CardProductType: '',
         } as UberSettlementBreakdownRecord
     }
+
+    return 'test'
 }
