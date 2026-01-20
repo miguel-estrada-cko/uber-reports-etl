@@ -73,11 +73,12 @@ describe('settlementBreakdown util', () => {
         expect(metrics.hasPayoutRow).toBe(true)
     })
 
-    it('should yield 1 charge and 1 non-financial charge rows', async () => {
+    it('should yield 5 rows (3 charges and 2 non-financial charge)', async () => {
         const report = buildSettlementBreakdownReport({
             rows: [
-                { type: CkoSettlementBreakdownColumnType.Charge, quantity: 1, isFinancial: false },
-                { type: CkoSettlementBreakdownColumnType.Charge, quantity: 1, isFinancial: true },
+                { type: CkoSettlementBreakdownColumnType.Charge, quantity: 2, isFinancial: false },
+                { type: CkoSettlementBreakdownColumnType.Charge, quantity: 1, isFinancial: false, isNegative: true },
+                { type: CkoSettlementBreakdownColumnType.Charge, quantity: 2, isFinancial: true },
             ],
         })
 
@@ -87,9 +88,9 @@ describe('settlementBreakdown util', () => {
             results.push(row)
         }
 
-        expect(results).toHaveLength(3)
-        expect(metrics.rowsIn).toBe(2)
-        expect(metrics.rowsOut).toBe(3)
+        expect(results).toHaveLength(4)
+        expect(metrics.rowsIn).toBe(5)
+        expect(metrics.rowsOut).toBe(4)
         expect(metrics.hasAdjustmentRow).toBe(true)
         expect(metrics.hasPayoutRow).toBe(true)
     })
