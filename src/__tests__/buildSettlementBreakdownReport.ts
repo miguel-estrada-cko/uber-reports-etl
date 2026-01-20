@@ -79,7 +79,8 @@ const buildSettlementBreakdownReportFile = ({
 
 type SettlementBreakdownFileRowOptions = {
     type: CkoSettlementBreakdownColumnType
-    quantity: number
+    quantity?: number
+    amount?: number
     isFinancial?: boolean
     isNegative?: boolean
 }
@@ -90,6 +91,7 @@ const buildSettlementBreakdownReportFileRows = (
     {
         type = CkoSettlementBreakdownColumnType.Charge,
         quantity = 1,
+        amount = 10,
         isFinancial = true,
         isNegative = false,
     }: SettlementBreakdownFileRowOptions
@@ -101,7 +103,7 @@ const buildSettlementBreakdownReportFileRows = (
     for (let i = 0; i < quantity; i++) {
         const rowId = Math.random().toString(36).substring(2, 8)
 
-        const amount: number = isFinancial ? (isNegative ? -10.0 : 10.0) : 0.0
+        const rowAmount: number = isFinancial ? (isNegative ? -amount : amount) : 0.0
 
         const row: Record<string, string> = {
             'Client Entity ID': 'ent_123',
@@ -115,7 +117,7 @@ const buildSettlementBreakdownReportFileRows = (
             'Available On': '2026-01-01T00:00:00',
             'Holding Currency': 'USD',
             'Payout ID': `${payoutId}`,
-            'Gross In Holding Currency': amount.toFixed(2),
+            'Gross In Holding Currency': rowAmount.toFixed(2),
             'Deduction In Holding Currency': '0.00',
             'Net In Holding Currency': '0.00',
             'Processing Fee In Holding Currency': '0.00',
@@ -124,7 +126,7 @@ const buildSettlementBreakdownReportFileRows = (
             'Tax In Holding Currency': '0.00',
             'Reserve In Holding Currency': '0.00',
             'Processing Currency': 'USD',
-            'Gross In Processing Currency': amount.toFixed(2),
+            'Gross In Processing Currency': rowAmount.toFixed(2),
             'FX Rate Applied': '1.00',
             'Payment Method': 'VISA',
             'Card Type': 'Credit',

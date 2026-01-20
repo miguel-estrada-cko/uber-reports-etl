@@ -9,6 +9,5 @@ module.exports = {
     transform: {
         ...tsJestTransformCfg,
     },
-    collectCoverage: true,
     coveragePathIgnorePatterns: ['/dist/', '/node_modules/', '/__tests__/'],
 }
