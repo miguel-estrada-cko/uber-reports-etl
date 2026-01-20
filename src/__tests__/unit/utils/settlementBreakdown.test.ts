@@ -37,6 +37,26 @@ describe('settlementBreakdown util', () => {
         expect(metrics.rowsOut).toBe(0)
     })
 
+    it('should yield 2 entries (1 financial charge row but no payout id)', async () => {
+        const report = buildSettlementBreakdownReport({
+            rows: [
+                { type: CkoSettlementBreakdownColumnType.Charge, quantity: 1, isFinancial: true, addPayoutId: false },
+            ],
+        })
+
+        const metrics = createSettlementBreakdownRowsMetrics()
+        const results: any[] = []
+        for await (const row of generateSettlementBreakdownRows(report, metrics)) {
+            results.push(row)
+        }
+
+        expect(results).toHaveLength(1)
+        expect(metrics.rowsIn).toBe(1)
+        expect(metrics.rowsOut).toBe(1)
+        expect(metrics.hasAdjustmentRow).toBe(false)
+        expect(metrics.hasPayoutRow).toBe(false)
+    })
+
     it('should yield 2 entries (1 financial charge row)', async () => {
         const report = buildSettlementBreakdownReport({
             rows: [{ type: CkoSettlementBreakdownColumnType.Charge, quantity: 1, isFinancial: true }],

@@ -83,6 +83,7 @@ type SettlementBreakdownFileRowOptions = {
     amount?: number
     isFinancial?: boolean
     isNegative?: boolean
+    addPayoutId?: boolean
 }
 
 const buildSettlementBreakdownReportFileRows = (
@@ -94,6 +95,7 @@ const buildSettlementBreakdownReportFileRows = (
         amount = 10,
         isFinancial = true,
         isNegative = false,
+        addPayoutId = true,
     }: SettlementBreakdownFileRowOptions
 ): string[] => {
     const rows: string[] = []
@@ -116,7 +118,7 @@ const buildSettlementBreakdownReportFileRows = (
             'Processed On': '2026-01-01T00:00:00',
             'Available On': '2026-01-01T00:00:00',
             'Holding Currency': 'USD',
-            'Payout ID': `${payoutId}`,
+            'Payout ID': addPayoutId ? `${payoutId}` : '',
             'Gross In Holding Currency': rowAmount.toFixed(2),
             'Deduction In Holding Currency': '0.00',
             'Net In Holding Currency': '0.00',

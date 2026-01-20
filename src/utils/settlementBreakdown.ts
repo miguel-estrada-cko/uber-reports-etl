@@ -11,6 +11,7 @@ import { stringToDate } from './stringToDate'
 import { stringToFloat } from './stringToFloat'
 import { parse } from 'csv-parse'
 import { createFloat } from './createFloat'
+import { withDefault } from './withDefault'
 
 export const normalizeSettlementBreakdownRow = (row: Record<string, string>): CkoSettlementBreakdownRecord => {
     return {
@@ -192,8 +193,8 @@ export async function* generateSettlementBreakdownRows(
         generatorMetrics.hasAdjustmentRow = true
 
         yield {
-            ClientEntityId: firstRow.ClientEntityId || '',
-            ClientEntityName: firstRow.ClientEntityName || '',
+            ClientEntityId: withDefault(firstRow.ClientEntityId, ''),
+            ClientEntityName: withDefault(firstRow.ClientEntityName, ''),
             ProcessingChannelId: '',
             ProcessingChannelName: '',
             Type: UberSettlementBreakdownColumnType.Adjustment,
@@ -201,16 +202,16 @@ export async function* generateSettlementBreakdownRows(
             Reference: '',
             ProcessedOn: null,
             AvailableOn: null,
-            HoldingCurrency: adjustmentRow.HoldingCurrency || '',
-            PayoutId: adjustmentRow.PayoutId || '',
-            GrossInHoldingCurrency: adjustmentRow.GrossInHoldingCurrency || null,
-            DeductionInHoldingCurrency: adjustmentRow.DeductionInHoldingCurrency || null,
-            NetInHoldingCurrency: adjustmentRow.NetInHoldingCurrency || null,
-            ProcessingFeeInHoldingCurrency: adjustmentRow.ProcessingFeeInHoldingCurrency || null,
-            SchemeFeeInHoldingCurrency: adjustmentRow.SchemeFeeInHoldingCurrency || null,
-            InterchangeInHoldingCurrency: adjustmentRow.InterchangeInHoldingCurrency || null,
-            TaxInHoldingCurrency: adjustmentRow.TaxInHoldingCurrency || null,
-            ReserveInHoldingCurrency: adjustmentRow.ReserveInHoldingCurrency || null,
+            HoldingCurrency: withDefault(adjustmentRow.HoldingCurrency, ''),
+            PayoutId: withDefault(adjustmentRow.PayoutId, ''),
+            GrossInHoldingCurrency: withDefault(adjustmentRow.GrossInHoldingCurrency, null),
+            DeductionInHoldingCurrency: withDefault(adjustmentRow.DeductionInHoldingCurrency, null),
+            NetInHoldingCurrency: withDefault(adjustmentRow.NetInHoldingCurrency, null),
+            ProcessingFeeInHoldingCurrency: withDefault(adjustmentRow.ProcessingFeeInHoldingCurrency, null),
+            SchemeFeeInHoldingCurrency: withDefault(adjustmentRow.SchemeFeeInHoldingCurrency, null),
+            InterchangeInHoldingCurrency: withDefault(adjustmentRow.InterchangeInHoldingCurrency, null),
+            TaxInHoldingCurrency: withDefault(adjustmentRow.TaxInHoldingCurrency, null),
+            ReserveInHoldingCurrency: withDefault(adjustmentRow.ReserveInHoldingCurrency, null),
             ProcessingCurrency: '',
             GrossInProcessingCurrency: null,
             NetInProcessingCurrency: null,
@@ -248,8 +249,8 @@ export async function* generateSettlementBreakdownRows(
         generatorMetrics.hasPayoutRow = true
 
         yield {
-            ClientEntityId: firstRow.ClientEntityId || '',
-            ClientEntityName: firstRow.ClientEntityName || '',
+            ClientEntityId: withDefault(firstRow.ClientEntityId, ''),
+            ClientEntityName: withDefault(firstRow.ClientEntityName, ''),
             ProcessingChannelId: '',
             ProcessingChannelName: '',
             Type: UberSettlementBreakdownColumnType.Payout,
@@ -257,16 +258,16 @@ export async function* generateSettlementBreakdownRows(
             Reference: '',
             ProcessedOn: null,
             AvailableOn: null,
-            HoldingCurrency: payoutRow.HoldingCurrency || '',
-            PayoutId: payoutRow.PayoutId || '',
-            GrossInHoldingCurrency: payoutRow.GrossInHoldingCurrency || null,
-            DeductionInHoldingCurrency: payoutRow.DeductionInHoldingCurrency || null,
-            NetInHoldingCurrency: payoutRow.NetInHoldingCurrency || null,
-            ProcessingFeeInHoldingCurrency: payoutRow.ProcessingFeeInHoldingCurrency || null,
-            SchemeFeeInHoldingCurrency: payoutRow.SchemeFeeInHoldingCurrency || null,
-            InterchangeInHoldingCurrency: payoutRow.InterchangeInHoldingCurrency || null,
-            TaxInHoldingCurrency: payoutRow.TaxInHoldingCurrency || null,
-            ReserveInHoldingCurrency: payoutRow.ReserveInHoldingCurrency || null,
+            HoldingCurrency: withDefault(payoutRow.HoldingCurrency, ''),
+            PayoutId: withDefault(payoutRow.PayoutId, ''),
+            GrossInHoldingCurrency: withDefault(payoutRow.GrossInHoldingCurrency, null),
+            DeductionInHoldingCurrency: withDefault(payoutRow.DeductionInHoldingCurrency, null),
+            NetInHoldingCurrency: withDefault(payoutRow.NetInHoldingCurrency, null),
+            ProcessingFeeInHoldingCurrency: withDefault(payoutRow.ProcessingFeeInHoldingCurrency, null),
+            SchemeFeeInHoldingCurrency: withDefault(payoutRow.SchemeFeeInHoldingCurrency, null),
+            InterchangeInHoldingCurrency: withDefault(payoutRow.InterchangeInHoldingCurrency, null),
+            TaxInHoldingCurrency: withDefault(payoutRow.TaxInHoldingCurrency, null),
+            ReserveInHoldingCurrency: withDefault(payoutRow.ReserveInHoldingCurrency, null),
             ProcessingCurrency: '',
             GrossInProcessingCurrency: null,
             NetInProcessingCurrency: null,
