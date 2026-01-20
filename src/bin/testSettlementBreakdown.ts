@@ -1,7 +1,12 @@
 #!/usr/bin/env node
 import fs, { ReadStream } from 'fs'
 import path from 'path'
-import { createError, generateSettlementBreakdownRows, GenerateSettlementBreakdownRowsMetrics } from '../utils'
+import {
+    createError,
+    createSettlementBreakdownRowsMetrics,
+    generateSettlementBreakdownRows,
+    GenerateSettlementBreakdownRowsMetrics,
+} from '../utils'
 import { stringify } from 'csv-stringify/sync'
 import { CkoSettlementBreakdownReport, FloatDecimal, UberSettlementBreakdownColumns } from '../types'
 import { ConsoleWriter, FileBatchWriter, WriterInterface } from '../services'
@@ -46,7 +51,7 @@ const main = async (): Promise<void> => {
         await reportWriter.write(columns)
 
         // Get the rows from the generator
-        const generatorMetrics: GenerateSettlementBreakdownRowsMetrics = { rowsIn: 0, rowsOut: 0 }
+        const generatorMetrics: GenerateSettlementBreakdownRowsMetrics = createSettlementBreakdownRowsMetrics()
         for await (const row of generateSettlementBreakdownRows(settlementBreakdownReport, generatorMetrics)) {
             const line = stringify([row], {
                 header: false,

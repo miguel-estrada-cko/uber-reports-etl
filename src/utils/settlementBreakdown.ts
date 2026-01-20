@@ -77,7 +77,16 @@ const CkoSettlementBreakdownAggregationColumns = [
 export interface GenerateSettlementBreakdownRowsMetrics {
     rowsIn: number
     rowsOut: number
+    hasAdjustmentRow: boolean
+    hasPayoutRow: boolean
 }
+
+export const createSettlementBreakdownRowsMetrics = (): GenerateSettlementBreakdownRowsMetrics => ({
+    rowsIn: 0,
+    rowsOut: 0,
+    hasAdjustmentRow: false,
+    hasPayoutRow: false,
+})
 
 export async function* generateSettlementBreakdownRows(
     settlementBreakdownReport: CkoSettlementBreakdownReport,
@@ -180,6 +189,8 @@ export async function* generateSettlementBreakdownRows(
     // Adjustment row
     if (adjustmentRow.PayoutId) {
         generatorMetrics.rowsOut++
+        generatorMetrics.hasAdjustmentRow = true
+
         yield {
             ClientEntityId: firstRow.ClientEntityId || '',
             ClientEntityName: firstRow.ClientEntityName || '',
@@ -234,6 +245,8 @@ export async function* generateSettlementBreakdownRows(
     // Payout row
     if (payoutRow.PayoutId) {
         generatorMetrics.rowsOut++
+        generatorMetrics.hasPayoutRow = true
+
         yield {
             ClientEntityId: firstRow.ClientEntityId || '',
             ClientEntityName: firstRow.ClientEntityName || '',
@@ -284,6 +297,4 @@ export async function* generateSettlementBreakdownRows(
             CardProductType: '',
         } as UberSettlementBreakdownRecord
     }
-
-    return 'test'
 }
