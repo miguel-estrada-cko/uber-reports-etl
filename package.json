@@ -9,7 +9,7 @@
         "test:coverage": "jest --coverage",
         "start": "node dist/job.js",
         "chmod": "chmod +x dist/*",
-        "job": "npm run build > /dev/null && npm run chmod > /dev/null && node dist/bin/testSettlementBreakdown.js",
+        "generate:settlement": "npm run build > /dev/null && npm run chmod > /dev/null && node dist/bin/generateSettlementReport.js",
         "lint": "eslint \"src/**/*.ts\"",
         "lint:fix": "eslint \"src/**/*.ts\" --fix",
         "format": "prettier --write \"src/**/*.ts\""
