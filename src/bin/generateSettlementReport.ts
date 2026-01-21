@@ -9,7 +9,8 @@ import {
 } from '../utils'
 import { stringify } from 'csv-stringify/sync'
 import { CkoSettlementBreakdownReport, FloatDecimal, UberSettlementBreakdownColumns } from '../types'
-import { ConsoleWriter, FileBatchWriter, WriterInterface } from '../services'
+import { ConsoleWriter, FileBatchWriter, FileStreamWriter, WriterInterface } from '../services'
+import { once } from 'events'
 
 /**
  * Job
@@ -48,7 +49,7 @@ const main = async (): Promise<void> => {
 
         // Prepare the writer
         //const reportWriter: WriterInterface = new ConsoleWriter()
-        const reportWriter: WriterInterface = new FileBatchWriter(outputFilePath)
+        const reportWriter: WriterInterface = new FileStreamWriter(outputFilePath)
         await reportWriter.open()
 
         // Retrieve and write column definition
@@ -57,22 +58,21 @@ const main = async (): Promise<void> => {
             header,
         }))
 
-        const columns = stringify([], { header: true, columns: uberSettlementBreakdownColumns }).trim()
-        await reportWriter.write(columns)
+        await reportWriter.write(stringify([], { header: true, columns: uberSettlementBreakdownColumns }).trim())
 
         // Get and write the rows from the generator
         const generatorMetrics: GenerateSettlementBreakdownRowsMetrics = createSettlementBreakdownRowsMetrics()
         for await (const row of generateSettlementBreakdownRows(settlementBreakdownReport, generatorMetrics)) {
-            const line = stringify([row], {
-                header: false,
-                columns: uberSettlementBreakdownColumns,
-                cast: {
-                    object: (value: unknown) => (value instanceof FloatDecimal ? value.toFixed(8) : String(value)),
-                    date: (value) => (value instanceof Date ? value.toISOString().slice(0, 23) : String(value)),
-                },
-            }).trim()
-
-            await reportWriter.write(line)
+            await reportWriter.write(
+                stringify([row], {
+                    header: false,
+                    columns: uberSettlementBreakdownColumns,
+                    cast: {
+                        object: (value: unknown) => (value instanceof FloatDecimal ? value.toFixed(8) : String(value)),
+                        date: (value) => (value instanceof Date ? value.toISOString().slice(0, 23) : String(value)),
+                    },
+                }).trim()
+            )
         }
 
         // Close the writer

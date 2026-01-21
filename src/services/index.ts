@@ -1,5 +1,6 @@
 export * from './writers/ConsoleWriter'
 export * from './writers/FileBatchWriter'
+export * from './writers/FileStreamWriter'
 export * from './writers/WriterInterface'
 export * from './Logger'
 export * from './LoggerInterface'
