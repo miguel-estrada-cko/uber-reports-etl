@@ -16,35 +16,42 @@ import { ConsoleWriter, FileBatchWriter, WriterInterface } from '../services'
  */
 const main = async (): Promise<void> => {
     console.time()
-    const [, , fileName] = process.argv
+    const [, , inputFileName] = process.argv
 
     try {
         // Verify source file
-        if (!fileName) {
+        if (!inputFileName) {
             throw new Error(`filename not provided`)
         }
 
-        const filePath: string = path.resolve(process.cwd(), fileName)
-        if (!fs.existsSync(filePath)) {
-            throw new Error(`file not exists: ${filePath}`)
+        const inputFilePath: string = path.resolve(process.cwd(), inputFileName)
+        if (!fs.existsSync(inputFilePath)) {
+            throw new Error(`file not exists: ${inputFilePath}`)
         }
 
-        // Read the file
-        const fileStream: ReadStream = fs.createReadStream(filePath, { encoding: 'utf-8' })
-
-        const payoutDate = new Date() // TODO: this date needs to come either from the file name, or deducted from the rows
+        // Set payout date
+        // TODO: this date needs to come either from the file name, or deducted from the rows
+        const payoutDate = new Date()
         payoutDate.setUTCHours(0, 0, 0, 0)
+
+        // Set output file
+        // TODO: output file name and path need to be set properly
+        const outputFileName = `settlement_report_${payoutDate.toISOString().slice(0, 10).replace(/-/g, '')}_00n.csv`
+        const outputFilePath = 'generated/' + path.basename(outputFileName)
+
+        // Create the report definition for the generator
         const settlementBreakdownReport: CkoSettlementBreakdownReport = {
             Date: payoutDate,
-            FileStream: fileStream,
+            InputFileStream: fs.createReadStream(inputFilePath, { encoding: 'utf-8' }),
+            OutputFileName: outputFileName,
         }
 
         // Prepare the writer
         //const reportWriter: WriterInterface = new ConsoleWriter()
-        const reportWriter: WriterInterface = new FileBatchWriter(`${filePath}-output.csv`)
+        const reportWriter: WriterInterface = new FileBatchWriter(outputFilePath)
         await reportWriter.open()
 
-        // Columns
+        // Retrieve and write column definition
         const uberSettlementBreakdownColumns = Object.entries(UberSettlementBreakdownColumns).map(([key, header]) => ({
             key,
             header,
@@ -53,7 +60,7 @@ const main = async (): Promise<void> => {
         const columns = stringify([], { header: true, columns: uberSettlementBreakdownColumns }).trim()
         await reportWriter.write(columns)
 
-        // Get the rows from the generator
+        // Get and write the rows from the generator
         const generatorMetrics: GenerateSettlementBreakdownRowsMetrics = createSettlementBreakdownRowsMetrics()
         for await (const row of generateSettlementBreakdownRows(settlementBreakdownReport, generatorMetrics)) {
             const line = stringify([row], {
@@ -71,12 +78,16 @@ const main = async (): Promise<void> => {
         // Close the writer
         await reportWriter.close()
 
+        // Log success results
+        console.log('[OK]')
         console.log(
-            `OK, input: ${fileName}, ${generatorMetrics.rowsIn.toLocaleString()} rows read, ${generatorMetrics.rowsOut.toLocaleString()} rows written`
+            `${inputFileName} (${generatorMetrics.rowsIn.toLocaleString()} rows) --> ${outputFileName} (${generatorMetrics.rowsOut.toLocaleString()} rows)`
         )
     } catch (e: unknown) {
+        // TODO: log error results properly
         const error: Error = createError(e)
 
+        console.log('[ERROR]')
         console.log(error.message)
         process.exit(1)
     } finally {

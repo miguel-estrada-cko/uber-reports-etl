@@ -9,7 +9,8 @@ export const buildSettlementBreakdownReport = (
 
     return {
         Date: options.date || new Date(),
-        FileStream: file as ReadStream,
+        InputFileStream: file as ReadStream,
+        OutputFileName: 'settlement-report-example.csv',
     }
 }
 

@@ -93,7 +93,7 @@ export async function* generateSettlementBreakdownRows(
     settlementBreakdownReport: CkoSettlementBreakdownReport,
     generatorMetrics: GenerateSettlementBreakdownRowsMetrics
 ): AsyncGenerator<UberSettlementBreakdownRecord> {
-    const fileStream = Readable.from(settlementBreakdownReport.FileStream).pipe(
+    const inputFileStream = Readable.from(settlementBreakdownReport.InputFileStream).pipe(
         parse({ columns: true, trim: true, delimiter: ',' })
     )
 
@@ -131,7 +131,7 @@ export async function* generateSettlementBreakdownRows(
     }
 
     // Read the file line by line
-    for await (const row of fileStream) {
+    for await (const row of inputFileStream) {
         generatorMetrics.rowsIn++
 
         const record = normalizeSettlementBreakdownRow(row)

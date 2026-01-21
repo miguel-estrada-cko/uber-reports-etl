@@ -3,7 +3,8 @@ import { ReadStream } from 'fs'
 
 export type CkoSettlementBreakdownReport = {
     Date: Date
-    FileStream: ReadStream
+    InputFileStream: ReadStream
+    OutputFileName: string
 }
 
 export type CkoSettlementBreakdownRecord = {
