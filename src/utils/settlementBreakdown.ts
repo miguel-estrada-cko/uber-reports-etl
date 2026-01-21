@@ -103,6 +103,7 @@ export async function* generateSettlementBreakdownRows(
     // Adjustment aggregation
     let adjustmentRow: Partial<UberSettlementBreakdownRecord> = {
         PayoutId: '',
+        PayoutDate: null,
         HoldingCurrency: '',
         GrossInHoldingCurrency: createFloat(0),
         DeductionInHoldingCurrency: createFloat(0),
@@ -117,6 +118,7 @@ export async function* generateSettlementBreakdownRows(
     // Payout row aggregation
     let payoutRow: Partial<UberSettlementBreakdownRecord> = {
         PayoutId: '',
+        PayoutDate: null,
         HoldingCurrency: '',
         GrossInHoldingCurrency: createFloat(0),
         DeductionInHoldingCurrency: createFloat(0),
@@ -141,6 +143,7 @@ export async function* generateSettlementBreakdownRows(
                 ProcessingChannelId: record.ProcessingChannelId,
                 ProcessingChannelName: record.ProcessingChannelName,
                 PayoutId: record.PayoutId,
+                PayoutDate: settlementBreakdownReport.Date,
             }
         }
 
@@ -157,6 +160,7 @@ export async function* generateSettlementBreakdownRows(
             const uberRecord: UberSettlementBreakdownRecord = {
                 ...record, // copia todos los campos
                 Type: record.Type as unknown as UberSettlementBreakdownColumnType,
+                PayoutDate: withDefault(firstRow.PayoutDate, null),
                 NetInProcessingCurrency: record.NetInHoldingCurrency?.div(record.FxRateApplied ?? 1) as Float,
             }
 
@@ -165,6 +169,7 @@ export async function* generateSettlementBreakdownRows(
         } else {
             if (!adjustmentRow.PayoutId) {
                 adjustmentRow.PayoutId = record.PayoutId
+                adjustmentRow.PayoutDate = firstRow.PayoutDate
                 adjustmentRow.HoldingCurrency = record.HoldingCurrency
             }
 
@@ -175,6 +180,7 @@ export async function* generateSettlementBreakdownRows(
 
         if (!payoutRow.PayoutId) {
             payoutRow.PayoutId = record.PayoutId
+            payoutRow.PayoutDate = firstRow.PayoutDate
             payoutRow.HoldingCurrency = record.HoldingCurrency
         }
 
@@ -197,13 +203,14 @@ export async function* generateSettlementBreakdownRows(
             ClientEntityName: withDefault(firstRow.ClientEntityName, ''),
             ProcessingChannelId: '',
             ProcessingChannelName: '',
-            Type: UberSettlementBreakdownColumnType.Adjustment,
+            Type: UberSettlementBreakdownColumnType.FeeAdjustment,
             PaymentId: '',
             Reference: '',
             ProcessedOn: null,
             AvailableOn: null,
             HoldingCurrency: withDefault(adjustmentRow.HoldingCurrency, ''),
             PayoutId: withDefault(adjustmentRow.PayoutId, ''),
+            PayoutDate: withDefault(adjustmentRow.PayoutDate, null),
             GrossInHoldingCurrency: withDefault(adjustmentRow.GrossInHoldingCurrency, null),
             DeductionInHoldingCurrency: withDefault(adjustmentRow.DeductionInHoldingCurrency, null),
             NetInHoldingCurrency: withDefault(adjustmentRow.NetInHoldingCurrency, null),
@@ -260,6 +267,7 @@ export async function* generateSettlementBreakdownRows(
             AvailableOn: null,
             HoldingCurrency: withDefault(payoutRow.HoldingCurrency, ''),
             PayoutId: withDefault(payoutRow.PayoutId, ''),
+            PayoutDate: withDefault(payoutRow.PayoutDate, null),
             GrossInHoldingCurrency: withDefault(payoutRow.GrossInHoldingCurrency, null),
             DeductionInHoldingCurrency: withDefault(payoutRow.DeductionInHoldingCurrency, null),
             NetInHoldingCurrency: withDefault(payoutRow.NetInHoldingCurrency, null),

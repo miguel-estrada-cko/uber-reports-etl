@@ -13,6 +13,7 @@ export type UberSettlementBreakdownRecord = {
     AvailableOn: Date | null
     HoldingCurrency: string
     PayoutId: string
+    PayoutDate: Date | null
     GrossInHoldingCurrency: Float | null
     DeductionInHoldingCurrency: Float | null
     NetInHoldingCurrency: Float | null
@@ -63,6 +64,7 @@ export const UberSettlementBreakdownColumns: Record<string, string> = {
     AvailableOn: 'Available On',
     HoldingCurrency: 'Holding Currency',
     PayoutId: 'Payout ID',
+    PayoutDate: 'Payout Date',
     GrossInHoldingCurrency: 'Gross In Holding Currency',
     DeductionInHoldingCurrency: 'Deduction In Holding Currency',
     NetInHoldingCurrency: 'Net In Holding Currency',
@@ -105,6 +107,6 @@ export enum UberSettlementBreakdownColumnType {
     Charge = 'Charge',
     PartialCharge = 'Partial Charge',
     Refund = 'Refund',
-    Adjustment = 'Adjustment',
+    FeeAdjustment = 'Fee Adjustment',
     Payout = 'Payout',
 }

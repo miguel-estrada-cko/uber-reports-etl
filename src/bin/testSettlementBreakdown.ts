@@ -31,8 +31,11 @@ const main = async (): Promise<void> => {
 
         // Read the file
         const fileStream: ReadStream = fs.createReadStream(filePath, { encoding: 'utf-8' })
+
+        const payoutDate = new Date() // TODO: this date needs to come either from the file name, or deducted from the rows
+        payoutDate.setUTCHours(0, 0, 0, 0)
         const settlementBreakdownReport: CkoSettlementBreakdownReport = {
-            Date: new Date(), // TODO: this date needs to come either from the file name, or deducted from the rows
+            Date: payoutDate,
             FileStream: fileStream,
         }
 
