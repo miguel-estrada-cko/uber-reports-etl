@@ -3,6 +3,7 @@ export class ReaderException extends Error {
         super(message)
         this.name = 'ReaderException'
 
+        /* istanbul ignore next */
         if (Error.captureStackTrace) {
             Error.captureStackTrace(this, this.constructor)
         }
