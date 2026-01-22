@@ -10,13 +10,11 @@ jest.mock('fs', () => ({
     },
 }))
 
-describe('ConsoleWriter Service', () => {
+describe('FileBatchWriter Service', () => {
     let writer: WriterInterface
-    let consoleSpy: jest.SpyInstance
 
     beforeEach(() => {
         writer = new FileBatchWriter('test.txt')
-        consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
     })
 
     afterEach(() => {
