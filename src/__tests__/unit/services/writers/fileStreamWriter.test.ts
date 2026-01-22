@@ -27,9 +27,9 @@ describe('FileStreamWriter Service', () => {
         writer = new FileStreamWriter('test.txt')
 
         mockStream = new EventEmitter()
-        mockStream.write = jest.fn().mockReturnValue(true) // Por defecto no hay backpressure
+        mockStream.write = jest.fn().mockReturnValue(true)
         mockStream.end = jest.fn().mockImplementation(() => {
-            mockStream.emit('finish') // Simulamos que el stream termina al llamar a end
+            mockStream.emit('finish')
         })
         ;(fs.createWriteStream as jest.Mock).mockReturnValue(mockStream)
     })
