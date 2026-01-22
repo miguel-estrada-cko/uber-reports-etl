@@ -1,11 +1,13 @@
+import { ReaderInterface } from '../services/readers'
 import { Float } from './Float'
-import { ReadStream } from 'fs'
 
+/*
 export type CkoSettlementBreakdownReport = {
     Date: Date
-    InputFileStream: ReadStream
+    InputReader: ReaderInterface
     OutputFileName: string
 }
+*/
 
 export type CkoSettlementBreakdownRecord = {
     ClientEntityId: string

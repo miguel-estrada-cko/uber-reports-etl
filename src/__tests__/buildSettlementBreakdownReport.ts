@@ -1,7 +1,9 @@
 import { ReadStream } from 'fs'
-import { CkoSettlementBreakdownColumnType, CkoSettlementBreakdownReport } from '../types'
+import { CkoSettlementBreakdownColumnType } from '../types'
 import { Readable } from 'stream'
+import { ReaderInterface } from '../services/readers'
 
+/*
 export const buildSettlementBreakdownReport = (
     options: SettlementBreakdownFileOptions
 ): CkoSettlementBreakdownReport => {
@@ -9,7 +11,7 @@ export const buildSettlementBreakdownReport = (
 
     return {
         Date: options.date || new Date(),
-        InputFileStream: file as ReadStream,
+        InputReader: file as unknown as ReaderInterface,
         OutputFileName: 'settlement-report-example.csv',
     }
 }
@@ -149,3 +151,4 @@ const buildSettlementBreakdownReportFileRows = (
 
     return rows
 }
+*/

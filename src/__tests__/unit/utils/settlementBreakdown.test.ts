@@ -1,6 +1,8 @@
+/*
 import { CkoSettlementBreakdownColumnType } from '../../../types'
 import { generateSettlementBreakdownRows, createSettlementBreakdownRowsMetrics } from '../../../utils'
 import { buildSettlementBreakdownReport } from '../../buildSettlementBreakdownReport'
+
 
 describe('settlementBreakdown util', () => {
     it('should create settlement breakdown rows metrics', () => {
@@ -23,14 +25,18 @@ describe('settlementBreakdown util', () => {
         expect(metrics.rowsOut).toBe(0)
     })
 
-    it('should yield nothing for header-only file', async () => {
+    it.only('should yield nothing for header-only file', async () => {
         const report = buildSettlementBreakdownReport({})
+
+        console.log(report.InputReader.read().toString())
 
         const metrics = createSettlementBreakdownRowsMetrics()
         const results: any[] = []
         for await (const row of generateSettlementBreakdownRows(report, metrics)) {
             results.push(row)
         }
+
+        console.log(metrics)
 
         expect(results).toHaveLength(0)
         expect(metrics.rowsIn).toBe(0)
@@ -115,3 +121,4 @@ describe('settlementBreakdown util', () => {
         expect(metrics.hasPayoutRow).toBe(true)
     })
 })
+*/

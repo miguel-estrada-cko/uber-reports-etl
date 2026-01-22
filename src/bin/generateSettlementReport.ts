@@ -1,16 +1,22 @@
 #!/usr/bin/env node
 import fs, { ReadStream } from 'fs'
 import path from 'path'
-import {
-    createError,
-    createSettlementBreakdownRowsMetrics,
-    generateSettlementBreakdownRows,
-    GenerateSettlementBreakdownRowsMetrics,
-} from '../utils'
+import { createError } from '../utils'
 import { stringify } from 'csv-stringify/sync'
-import { CkoSettlementBreakdownReport, FloatDecimal, UberSettlementBreakdownColumns } from '../types'
+import {
+    CkoSettlementBreakdownRecord,
+    FloatDecimal,
+    UberSettlementBreakdownColumns,
+    UberSettlementBreakdownRecord,
+} from '../types'
+import { CsvFileStreamReader, ReaderInterface } from '../services/readers'
 import { ConsoleWriter, FileBatchWriter, FileStreamWriter, WriterInterface } from '../services'
-import { once } from 'events'
+import { CkoSettlementBreakdownCsvMapper } from '../services/mappers'
+import {
+    ProcessorInterface,
+    SettlementBreakdownProcessor,
+    SettlementBreakdownProcessorMetrics,
+} from '../services/processors'
 
 /**
  * Job
@@ -25,45 +31,55 @@ const main = async (): Promise<void> => {
             throw new Error(`filename not provided`)
         }
 
-        const inputFilePath: string = path.resolve(process.cwd(), inputFileName)
-        if (!fs.existsSync(inputFilePath)) {
-            throw new Error(`file not exists: ${inputFilePath}`)
+        // Prepare the reader
+        const reader: ReaderInterface = new CsvFileStreamReader(inputFileName)
+        try {
+            await reader.open()
+        } catch (e: unknown) {
+            const error: Error = createError(e)
+            throw new Error(`failed to open the resource: ${error.message}`)
         }
+
+        // Prepare the mapper
+        const mapper = new CkoSettlementBreakdownCsvMapper()
+        const inputRows = await reader.read()
+        const mappedRows = (async function* () {
+            for await (const row of inputRows) {
+                yield mapper.map(row)
+            }
+        })()
 
         // Set payout date
         // TODO: this date needs to come either from the file name, or deducted from the rows
-        const payoutDate = new Date()
-        payoutDate.setUTCHours(0, 0, 0, 0)
+        const payoutDate: Date = new Date(new Date().setUTCHours(0, 0, 0, 0))
 
         // Set output file
         // TODO: output file name and path need to be set properly
         const outputFileName = `settlement_report_${payoutDate.toISOString().slice(0, 10).replace(/-/g, '')}_00n.csv`
         const outputFilePath = 'generated/' + path.basename(outputFileName)
 
-        // Create the report definition for the generator
-        const settlementBreakdownReport: CkoSettlementBreakdownReport = {
-            Date: payoutDate,
-            InputFileStream: fs.createReadStream(inputFilePath, { encoding: 'utf-8' }),
-            OutputFileName: outputFileName,
-        }
-
         // Prepare the writer
         //const reportWriter: WriterInterface = new ConsoleWriter()
-        const reportWriter: WriterInterface = new FileStreamWriter(outputFilePath)
-        await reportWriter.open()
+        const writer: WriterInterface = new FileStreamWriter(outputFilePath)
+        await writer.open()
 
         // Retrieve and write column definition
         const uberSettlementBreakdownColumns = Object.entries(UberSettlementBreakdownColumns).map(([key, header]) => ({
             key,
             header,
         }))
+        await writer.write(stringify([], { header: true, columns: uberSettlementBreakdownColumns }).trim())
 
-        await reportWriter.write(stringify([], { header: true, columns: uberSettlementBreakdownColumns }).trim())
+        // Prepare the processor
+        const processor: ProcessorInterface<
+            CkoSettlementBreakdownRecord,
+            UberSettlementBreakdownRecord,
+            SettlementBreakdownProcessorMetrics
+        > = new SettlementBreakdownProcessor(payoutDate, outputFileName)
 
-        // Get and write the rows from the generator
-        const generatorMetrics: GenerateSettlementBreakdownRowsMetrics = createSettlementBreakdownRowsMetrics()
-        for await (const row of generateSettlementBreakdownRows(settlementBreakdownReport, generatorMetrics)) {
-            await reportWriter.write(
+        // Process mapped lines and write
+        for await (const row of processor.process(mappedRows)) {
+            await writer.write(
                 stringify([row], {
                     header: false,
                     columns: uberSettlementBreakdownColumns,
@@ -75,13 +91,14 @@ const main = async (): Promise<void> => {
             )
         }
 
-        // Close the writer
-        await reportWriter.close()
+        // Close the reader & writer
+        await reader.close()
+        await writer.close()
 
         // Log success results
-        console.log('[OK]')
+        console.log('[OK...]')
         console.log(
-            `${inputFileName} (${generatorMetrics.rowsIn.toLocaleString()} rows) --> ${outputFileName} (${generatorMetrics.rowsOut.toLocaleString()} rows)`
+            `${inputFileName} (${processor.metrics().rowsIn.toLocaleString()} rows) --> ${outputFileName} (${processor.metrics().rowsOut.toLocaleString()} rows)`
         )
     } catch (e: unknown) {
         // TODO: log error results properly
