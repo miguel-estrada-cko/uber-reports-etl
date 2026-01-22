@@ -51,6 +51,14 @@ describe('FileStreamWriter Service', () => {
         expect(fs.createWriteStream).toHaveBeenCalledWith(expect.stringContaining('test.txt.tmp'), { encoding: 'utf8' })
     })
 
+    it('should throw if open (mkdir) fails', async () => {
+        ;(fs.promises.mkdir as jest.Mock).mockRejectedValueOnce(new Error('mkdir failed'))
+
+        const result = writer.open()
+
+        await expect(result).rejects.toThrow('mkdir failed')
+    })
+
     it('should throw error if stream is not open', async () => {
         await expect(writer.write('some line')).rejects.toThrow('stream is not open')
     })
@@ -84,6 +92,16 @@ describe('FileStreamWriter Service', () => {
         expect(mockStream.end).toHaveBeenCalled()
         expect(once).toHaveBeenCalledWith(mockStream, 'finish')
         expect(fs.promises.rename).toHaveBeenCalledWith(expect.any(String), 'test.txt')
+    })
+
+    it('should throw if close (rename) fails', async () => {
+        await writer.open()
+        ;(once as jest.Mock).mockResolvedValueOnce([undefined])
+        ;(fs.promises.rename as jest.Mock).mockRejectedValueOnce(new Error('rename failed'))
+
+        const result = writer.close()
+
+        await expect(result).rejects.toThrow('rename failed')
     })
 
     it('should return true even if stream was never opened', async () => {
