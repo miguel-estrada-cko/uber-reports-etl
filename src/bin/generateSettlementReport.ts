@@ -11,7 +11,7 @@ import {
 } from '../types'
 import { CsvFileStreamReader, ReaderInterface } from '../services/readers'
 import { ConsoleWriter, FileBatchWriter, FileStreamWriter, WriterInterface } from '../services'
-import { CkoSettlementBreakdownCsvMapper } from '../services/mappers'
+import { CkoSettlementBreakdownCsvMapper, MapperInterface } from '../services/mappers'
 import {
     ProcessorInterface,
     SettlementBreakdownProcessor,
@@ -41,7 +41,10 @@ const main = async (): Promise<void> => {
         }
 
         // Prepare the mapper
-        const mapper = new CkoSettlementBreakdownCsvMapper()
+        const mapper: MapperInterface<
+            Record<string, string>,
+            CkoSettlementBreakdownRecord
+        > = new CkoSettlementBreakdownCsvMapper()
         const inputRows = await reader.read()
         const mappedRows = (async function* () {
             for await (const row of inputRows) {

@@ -1,7 +1,8 @@
 import { ReadStream } from 'fs'
-import { CkoSettlementBreakdownColumnType } from '../types'
+import { CkoSettlementBreakdownColumnType, CkoSettlementBreakdownRecord } from '../types'
 import { Readable } from 'stream'
 import { ReaderInterface } from '../services/readers'
+import { CkoSettlementBreakdownCsvMapper } from '../services/mappers'
 
 /*
 export const buildSettlementBreakdownReport = (
@@ -15,6 +16,10 @@ export const buildSettlementBreakdownReport = (
         OutputFileName: 'settlement-report-example.csv',
     }
 }
+
+
+
+*/
 
 const SettlementBreakdownHeader = [
     'Client Entity ID',
@@ -57,6 +62,7 @@ type SettlementBreakdownFileOptions = {
     header?: boolean
 }
 
+/*
 const buildSettlementBreakdownReportFile = ({
     date = new Date(),
     rows = [],
@@ -80,6 +86,7 @@ const buildSettlementBreakdownReportFile = ({
 
     return Readable.from(lines.join('\n'))
 }
+*/
 
 type SettlementBreakdownFileRowOptions = {
     type: CkoSettlementBreakdownColumnType
@@ -90,9 +97,9 @@ type SettlementBreakdownFileRowOptions = {
     addPayoutId?: boolean
 }
 
-const buildSettlementBreakdownReportFileRows = (
+export const buildSettlementBreakdownRows = (
     payoutId: string,
-    date: Date,
+    payoutDate: Date,
     {
         type = CkoSettlementBreakdownColumnType.Charge,
         quantity = 1,
@@ -101,10 +108,10 @@ const buildSettlementBreakdownReportFileRows = (
         isNegative = false,
         addPayoutId = true,
     }: SettlementBreakdownFileRowOptions
-): string[] => {
-    const rows: string[] = []
+): Record<string, string>[] => {
+    const rows: Record<string, string>[] = []
 
-    date.setHours(0, 0, 0, 0)
+    payoutDate.setHours(0, 0, 0, 0)
 
     for (let i = 0; i < quantity; i++) {
         const rowId = Math.random().toString(36).substring(2, 8)
@@ -123,7 +130,7 @@ const buildSettlementBreakdownReportFileRows = (
             'Available On': '2026-01-01T00:00:00',
             'Holding Currency': 'USD',
             'Payout ID': addPayoutId ? `${payoutId}` : '',
-            'Payout Date': date.toISOString(),
+            'Payout Date': payoutDate.toISOString(),
             'Gross In Holding Currency': rowAmount.toFixed(2),
             'Deduction In Holding Currency': '0.00',
             'Net In Holding Currency': '0.00',
@@ -146,9 +153,32 @@ const buildSettlementBreakdownReportFileRows = (
             Timezone: 'UTC',
         }
 
-        rows.push(SettlementBreakdownHeader.map((column) => row[column]).join(','))
+        rows.push(row)
     }
 
     return rows
 }
-*/
+
+export const buildSettlementBreakdownRecords = (
+    payoutId: string,
+    payoutDate: Date,
+    {
+        type = CkoSettlementBreakdownColumnType.Charge,
+        quantity = 1,
+        amount = 10,
+        isFinancial = true,
+        isNegative = false,
+        addPayoutId = true,
+    }: SettlementBreakdownFileRowOptions
+): CkoSettlementBreakdownRecord[] => {
+    const rows = buildSettlementBreakdownRows(payoutId, payoutDate, {
+        type,
+        quantity,
+        amount,
+        isFinancial,
+        isNegative,
+        addPayoutId,
+    })
+
+    return rows.map((row) => new CkoSettlementBreakdownCsvMapper().map(row))
+}

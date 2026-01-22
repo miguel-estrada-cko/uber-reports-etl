@@ -51,9 +51,7 @@ export class SettlementBreakdownProcessor implements ProcessorInterface<
         return this.processorMetrics
     }
 
-    async *process(
-        records: AsyncIterable<CkoSettlementBreakdownRecord>
-    ): AsyncGenerator<UberSettlementBreakdownRecord> {
+    async *process(records: Iterable<CkoSettlementBreakdownRecord>): AsyncGenerator<UberSettlementBreakdownRecord> {
         // Common rows
         let firstRow: Partial<UberSettlementBreakdownRecord> | null = null
 
