@@ -21,9 +21,20 @@ import {
 /**
  * Job
  */
-const main = async (): Promise<void> => {
-    console.time()
-    const [, , inputFileName] = process.argv
+export const generateSettlementReport = async (inputFileName: string): Promise<object> => {
+    let generator: {
+        success: boolean
+        duration: number
+        input: string | null
+        output: string | null
+        metrics: unknown
+    } = {
+        success: false,
+        duration: performance.now(),
+        input: inputFileName,
+        output: null,
+        metrics: null,
+    }
 
     try {
         // Verify source file
@@ -60,6 +71,8 @@ const main = async (): Promise<void> => {
         // TODO: output file name and path need to be set properly
         const outputFileName = `settlement_report_${payoutDate.toISOString().slice(0, 10).replace(/-/g, '')}_00n.csv`
         const outputFilePath = 'generated/' + path.basename(outputFileName)
+
+        generator.output = outputFilePath
 
         // Prepare the writer
         //const reportWriter: WriterInterface = new ConsoleWriter()
@@ -98,33 +111,45 @@ const main = async (): Promise<void> => {
         await reader.close()
         await writer.close()
 
-        // Log success results
-        console.log('[OK...]')
-        console.log(
-            `${inputFileName} (${processor.metrics().rowsIn.toLocaleString()} rows) --> ${outputFileName} (${processor.metrics().rowsOut.toLocaleString()} rows)`
-        )
+        generator.success = true
+        generator.metrics = processor.metrics()
     } catch (e: unknown) {
         // TODO: log error results properly
         const error: Error = createError(e)
 
         console.log('[ERROR]')
+        console.log(error)
         console.log(error.message)
-        process.exit(1)
+
+        throw new Error()
     } finally {
-        console.timeEnd()
     }
+
+    generator.duration = performance.now() - generator.duration
+    return generator
 }
 
 /**
  * Bootstrap
  */
-;(async () => {
-    try {
-        await main()
-        process.exit(0)
-    } catch (e: unknown) {
-        const error: Error = createError(e)
-        console.error('Job failed', error.message)
-        process.exit(1)
-    }
-})()
+/* istanbul ignore next */
+if (require.main === module) {
+    ;(async () => {
+        try {
+            const [, , inputFileName] = process.argv
+            const generator: any = await generateSettlementReport(inputFileName)
+
+            // Log success results
+            console.log(
+                `OK (${generator.duration.toFixed(0)}ms): ` +
+                    `${generator.input} (${generator?.metrics?.rowsIn.toLocaleString()} rows) --> ${generator.output} (${generator.metrics.rowsOut.toLocaleString()} rows)`
+            )
+
+            process.exit(0)
+        } catch (e: unknown) {
+            const error: Error = createError(e)
+            console.error('Job failed', error.message)
+            process.exit(1)
+        }
+    })()
+}

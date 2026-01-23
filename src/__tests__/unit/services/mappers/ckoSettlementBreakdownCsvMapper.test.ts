@@ -23,11 +23,13 @@ describe('CkoSettlementBreakdownCsvMapper Service', () => {
     })
 
     it('should map a row', () => {
-        const [row] = buildSettlementBreakdownRows(payoutId, payoutDate, {
-            type: CkoSettlementBreakdownColumnType.Charge,
-            quantity: 1,
-            amount: 20,
-        })
+        const [row] = buildSettlementBreakdownRows(payoutId, payoutDate, [
+            {
+                type: CkoSettlementBreakdownColumnType.Charge,
+                quantity: 1,
+                amount: 20,
+            },
+        ])
 
         const result = mapper.map(row)
 

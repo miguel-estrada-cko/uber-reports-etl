@@ -45,6 +45,25 @@ type SettlementBreakdownFileRowOptions = {
     addPayoutId?: boolean
 }
 
+export const buildSettlementBreakdownCsvContent = (
+    payoutId: string,
+    payoutDate: Date,
+    rows: SettlementBreakdownFileRowOptions[],
+    { header = true }: { header: boolean | null }
+): string => {
+    const content: string[] = []
+
+    if (header) {
+        content.push(SettlementBreakdownHeader.join(','))
+    }
+
+    for (const record of buildSettlementBreakdownRows(payoutId, payoutDate, rows)) {
+        content.push(Object.values(record).join(','))
+    }
+
+    return content.join('\n')
+}
+
 export const buildSettlementBreakdownRecords = (
     payoutId: string,
     payoutDate: Date,
@@ -56,7 +75,6 @@ export const buildSettlementBreakdownRecords = (
         records.push(...buildSettlementBreakdownRecord(payoutId, payoutDate, row))
     }
 
-    // Shuffle lines
     records.sort(() => Math.random() - 0.5)
 
     return records
@@ -74,7 +92,7 @@ export const buildSettlementBreakdownRecord = (
         addPayoutId = true,
     }: SettlementBreakdownFileRowOptions
 ): CkoSettlementBreakdownRecord[] => {
-    const rows = buildSettlementBreakdownRows(payoutId, payoutDate, {
+    const rows = buildSettlementBreakdownRow(payoutId, payoutDate, {
         type,
         quantity,
         amount,
@@ -87,6 +105,22 @@ export const buildSettlementBreakdownRecord = (
 }
 
 export const buildSettlementBreakdownRows = (
+    payoutId: string,
+    payoutDate: Date,
+    rows: SettlementBreakdownFileRowOptions[]
+): Record<string, string>[] => {
+    let records: Record<string, string>[] = []
+
+    for (const row of rows) {
+        records.push(...buildSettlementBreakdownRow(payoutId, payoutDate, row))
+    }
+
+    records.sort(() => Math.random() - 0.5)
+
+    return records
+}
+
+export const buildSettlementBreakdownRow = (
     payoutId: string,
     payoutDate: Date,
     {
