@@ -65,6 +65,14 @@ describe('Inspección de salida con mock-fs', () => {
         mock.restore()
     })
 
+    it('should not generate by no provided filename', async () => {
+        await expect(generateSettlementReport('')).rejects.toThrow()
+    })
+
+    it('should not generate by a given unexisting file', async () => {
+        await expect(generateSettlementReport('fixtures/unexisting.csv')).rejects.toThrow()
+    })
+
     it('should generate an empty file from an empty file', async () => {
         const generator: any = await generateSettlementReport('fixtures/empty.csv')
 
