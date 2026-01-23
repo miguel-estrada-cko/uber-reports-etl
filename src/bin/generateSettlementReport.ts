@@ -5,6 +5,7 @@ import { createError } from '../utils'
 import { stringify } from 'csv-stringify/sync'
 import {
     CkoSettlementBreakdownRecord,
+    Float,
     FloatDecimal,
     UberSettlementBreakdownColumns,
     UberSettlementBreakdownRecord,
@@ -102,8 +103,8 @@ export const generateSettlementReport = async (inputFileName: string | null): Pr
                     header: false,
                     columns: uberSettlementBreakdownColumns,
                     cast: {
-                        object: (value: unknown) => (value instanceof FloatDecimal ? value.toFixed(8) : String(value)),
-                        date: (value) => (value instanceof Date ? value.toISOString().slice(0, 23) : String(value)),
+                        object: (value: unknown) => (value as unknown as Float).toFixed(8),
+                        date: (value: Date) => value.toISOString().slice(0, 23),
                     },
                 }).trim()
             )
