@@ -21,15 +21,17 @@ import {
 /**
  * Job
  */
-export const generateSettlementReport = async (inputFileName: string): Promise<object> => {
+export const generateSettlementReport = async (inputFileName: string | null): Promise<object> => {
     let generator: {
         success: boolean
+        error: Error | null
         duration: number
         input: string | null
         output: string | null
         metrics: unknown
     } = {
         success: false,
+        error: null,
         duration: performance.now(),
         input: inputFileName,
         output: null,
@@ -114,18 +116,12 @@ export const generateSettlementReport = async (inputFileName: string): Promise<o
         generator.success = true
         generator.metrics = processor.metrics()
     } catch (e: unknown) {
-        // TODO: log error results properly
         const error: Error = createError(e)
-
-        console.log('[ERROR]')
-        console.log(error)
-        console.log(error.message)
-
-        throw new Error()
+        generator.error = error
     } finally {
+        generator.duration = performance.now() - generator.duration
     }
 
-    generator.duration = performance.now() - generator.duration
     return generator
 }
 
@@ -135,20 +131,18 @@ export const generateSettlementReport = async (inputFileName: string): Promise<o
 /* istanbul ignore next */
 if (require.main === module) {
     ;(async () => {
-        try {
-            const [, , inputFileName] = process.argv
-            const generator: any = await generateSettlementReport(inputFileName)
+        const [, , inputFileName] = process.argv
+        const generator: any = await generateSettlementReport(inputFileName)
 
-            // Log success results
+        if (generator.success) {
             console.log(
                 `OK (${generator.duration.toFixed(0)}ms): ` +
                     `${generator.input} (${generator?.metrics?.rowsIn.toLocaleString()} rows) --> ${generator.output} (${generator.metrics.rowsOut.toLocaleString()} rows)`
             )
 
             process.exit(0)
-        } catch (e: unknown) {
-            const error: Error = createError(e)
-            console.error('Job failed', error.message)
+        } else {
+            console.error('ERROR ', generator.error.message)
             process.exit(1)
         }
     })()
