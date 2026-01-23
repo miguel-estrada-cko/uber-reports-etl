@@ -1,25 +1,5 @@
-import { ReadStream } from 'fs'
 import { CkoSettlementBreakdownColumnType, CkoSettlementBreakdownRecord } from '../types'
-import { Readable } from 'stream'
-import { ReaderInterface } from '../services/readers'
 import { CkoSettlementBreakdownCsvMapper } from '../services/mappers'
-
-/*
-export const buildSettlementBreakdownReport = (
-    options: SettlementBreakdownFileOptions
-): CkoSettlementBreakdownReport => {
-    const file = buildSettlementBreakdownReportFile(options)
-
-    return {
-        Date: options.date || new Date(),
-        InputReader: file as unknown as ReaderInterface,
-        OutputFileName: 'settlement-report-example.csv',
-    }
-}
-
-
-
-*/
 
 const SettlementBreakdownHeader = [
     'Client Entity ID',
@@ -56,38 +36,6 @@ const SettlementBreakdownHeader = [
     'Timezone',
 ] as const
 
-type SettlementBreakdownFileOptions = {
-    date?: Date
-    rows?: SettlementBreakdownFileRowOptions[]
-    header?: boolean
-}
-
-/*
-const buildSettlementBreakdownReportFile = ({
-    date = new Date(),
-    rows = [],
-    header = true,
-}: SettlementBreakdownFileOptions): Readable => {
-    let lines: string[] = []
-
-    const payoutId = Math.random().toString(36).substring(2, 8)
-
-    for (const row of rows) {
-        lines.push(...buildSettlementBreakdownReportFileRows(payoutId, date, row))
-    }
-
-    // Shuffle lines
-    lines.sort(() => Math.random() - 0.5)
-
-    // Add header
-    if (header) {
-        lines.unshift(SettlementBreakdownHeader.join(','))
-    }
-
-    return Readable.from(lines.join('\n'))
-}
-*/
-
 type SettlementBreakdownFileRowOptions = {
     type: CkoSettlementBreakdownColumnType
     quantity?: number
@@ -95,6 +43,47 @@ type SettlementBreakdownFileRowOptions = {
     isFinancial?: boolean
     isNegative?: boolean
     addPayoutId?: boolean
+}
+
+export const buildSettlementBreakdownRecords = (
+    payoutId: string,
+    payoutDate: Date,
+    rows: SettlementBreakdownFileRowOptions[]
+): CkoSettlementBreakdownRecord[] => {
+    let records: CkoSettlementBreakdownRecord[] = []
+
+    for (const row of rows) {
+        records.push(...buildSettlementBreakdownRecord(payoutId, payoutDate, row))
+    }
+
+    // Shuffle lines
+    records.sort(() => Math.random() - 0.5)
+
+    return records
+}
+
+export const buildSettlementBreakdownRecord = (
+    payoutId: string,
+    payoutDate: Date,
+    {
+        type = CkoSettlementBreakdownColumnType.Charge,
+        quantity = 1,
+        amount = 10,
+        isFinancial = true,
+        isNegative = false,
+        addPayoutId = true,
+    }: SettlementBreakdownFileRowOptions
+): CkoSettlementBreakdownRecord[] => {
+    const rows = buildSettlementBreakdownRows(payoutId, payoutDate, {
+        type,
+        quantity,
+        amount,
+        isFinancial,
+        isNegative,
+        addPayoutId,
+    })
+
+    return rows.map((row) => new CkoSettlementBreakdownCsvMapper().map(row))
 }
 
 export const buildSettlementBreakdownRows = (
@@ -157,28 +146,4 @@ export const buildSettlementBreakdownRows = (
     }
 
     return rows
-}
-
-export const buildSettlementBreakdownRecords = (
-    payoutId: string,
-    payoutDate: Date,
-    {
-        type = CkoSettlementBreakdownColumnType.Charge,
-        quantity = 1,
-        amount = 10,
-        isFinancial = true,
-        isNegative = false,
-        addPayoutId = true,
-    }: SettlementBreakdownFileRowOptions
-): CkoSettlementBreakdownRecord[] => {
-    const rows = buildSettlementBreakdownRows(payoutId, payoutDate, {
-        type,
-        quantity,
-        amount,
-        isFinancial,
-        isNegative,
-        addPayoutId,
-    })
-
-    return rows.map((row) => new CkoSettlementBreakdownCsvMapper().map(row))
 }

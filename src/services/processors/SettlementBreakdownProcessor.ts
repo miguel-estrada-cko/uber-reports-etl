@@ -89,8 +89,6 @@ export class SettlementBreakdownProcessor implements ProcessorInterface<
         for await (const record of records) {
             this.processorMetrics.rowsIn++
 
-            //const record = normalizeSettlementBreakdownRow(row)
-
             if (!firstRow) {
                 firstRow = {
                     ClientEntityId: record.ClientEntityId,
@@ -116,7 +114,9 @@ export class SettlementBreakdownProcessor implements ProcessorInterface<
                     ...record, // copia todos los campos
                     Type: record.Type as unknown as UberSettlementBreakdownColumnType,
                     PayoutDate: withDefault(firstRow.PayoutDate, null),
-                    NetInProcessingCurrency: record.NetInHoldingCurrency?.div(record.FxRateApplied ?? 1) as Float,
+                    NetInProcessingCurrency: record.NetInHoldingCurrency?.div(
+                        withDefault(record.FxRateApplied, createFloat(1))
+                    ) as Float,
                 }
 
                 this.processorMetrics.rowsOut++
@@ -129,7 +129,9 @@ export class SettlementBreakdownProcessor implements ProcessorInterface<
                 }
 
                 for (const field of CkoSettlementBreakdownAggregationColumns) {
-                    adjustmentRow[field] = adjustmentRow[field]?.plus(record[field] ?? 0) as Float
+                    adjustmentRow[field] = adjustmentRow[field]?.plus(
+                        withDefault(record[field], createFloat(0))
+                    ) as Float
                 }
             }
 
@@ -140,7 +142,7 @@ export class SettlementBreakdownProcessor implements ProcessorInterface<
             }
 
             for (const field of CkoSettlementBreakdownAggregationColumns) {
-                payoutRow[field] = payoutRow[field]?.plus(record[field] ?? 0) as Float
+                payoutRow[field] = payoutRow[field]?.plus(withDefault(record[field], createFloat(0))) as Float
             }
         }
 
