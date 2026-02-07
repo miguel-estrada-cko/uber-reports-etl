@@ -1,8 +1,8 @@
 import { assertImplementsInterface } from '../../../assertImplementsInterface'
-import { ConsoleWriter, WriterInterface } from '../../../../services'
+import { ConsoleWriter, Writer } from '../../../../services'
 
 describe('ConsoleWriter Service', () => {
-    let writer: WriterInterface
+    let writer: Writer
     let consoleSpy: jest.SpyInstance
 
     beforeEach(() => {
@@ -15,7 +15,7 @@ describe('ConsoleWriter Service', () => {
     })
 
     it('should implement the interface', () => {
-        expect(assertImplementsInterface<WriterInterface>(writer)).toBeTruthy()
+        expect(assertImplementsInterface<Writer>(writer)).toBeTruthy()
     })
 
     it('should open successfully', async () => {

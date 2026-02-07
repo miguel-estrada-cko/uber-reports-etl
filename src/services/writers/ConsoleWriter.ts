@@ -1,6 +1,6 @@
-import { WriterInterface } from './WriterInterface'
+import { Writer } from './Writer'
 
-export class ConsoleWriter implements WriterInterface {
+export class ConsoleWriter implements Writer {
     constructor() {}
 
     async open(): Promise<boolean> {

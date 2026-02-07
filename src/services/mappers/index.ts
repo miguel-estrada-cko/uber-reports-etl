@@ -1,2 +1,2 @@
 export * from './CkoSettlementBreakdownCsvMapper'
-export * from './MapperInterface'
+export * from './Mapper'

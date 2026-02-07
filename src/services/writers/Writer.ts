@@ -1,4 +1,4 @@
-export interface WriterInterface {
+export interface Writer {
     open(): Promise<boolean>
 
     write(line: string): Promise<boolean>

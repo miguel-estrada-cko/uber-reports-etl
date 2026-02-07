@@ -1,10 +1,9 @@
-import { ReaderInterface } from '../services/readers'
 import { Float } from './Float'
 
 /*
 export type CkoSettlementBreakdownReport = {
     Date: Date
-    InputReader: ReaderInterface
+    InputReader: Reader
     OutputFileName: string
 }
 */

@@ -1,4 +1,4 @@
-import { ProcessorInterface } from './ProcessorInterface'
+import { Processor } from './Processor'
 import {
     CkoSettlementBreakdownColumnType,
     CkoSettlementBreakdownRecord,
@@ -7,6 +7,8 @@ import {
     UberSettlementBreakdownRecord,
 } from '../../types'
 import { createFloat, withDefault } from '../../utils'
+import { ProcessorMetrics } from './ProcessorMetrics'
+import { SettlementBreakdownProperties } from '../../handlers'
 
 const CkoSettlementBreakdownAggregationColumns = [
     'GrossInHoldingCurrency',
@@ -19,9 +21,7 @@ const CkoSettlementBreakdownAggregationColumns = [
     'ReserveInHoldingCurrency',
 ] as const satisfies readonly (keyof UberSettlementBreakdownRecord)[]
 
-export interface SettlementBreakdownProcessorMetrics {
-    rowsIn: number
-    rowsOut: number
+export interface SettlementBreakdownProcessorMetrics extends ProcessorMetrics {
     hasAdjustmentRow: boolean
     hasPayoutRow: boolean
 }
@@ -33,18 +33,17 @@ export const createSettlementBreakdownRowsMetrics = (): SettlementBreakdownProce
     hasPayoutRow: false,
 })
 
-export class SettlementBreakdownProcessor implements ProcessorInterface<
+export class SettlementBreakdownProcessor implements Processor<
+    SettlementBreakdownProperties,
     CkoSettlementBreakdownRecord,
     UberSettlementBreakdownRecord,
     SettlementBreakdownProcessorMetrics
 > {
     private processorMetrics: SettlementBreakdownProcessorMetrics = createSettlementBreakdownRowsMetrics()
-    private payoutId: Date
-    private outputFileName: string
+    private properties: SettlementBreakdownProperties
 
-    constructor(payoutId: Date, outputFileName: string) {
-        this.payoutId = payoutId
-        this.outputFileName = outputFileName
+    constructor(properties: SettlementBreakdownProperties) {
+        this.properties = properties
     }
 
     metrics(): SettlementBreakdownProcessorMetrics {
@@ -96,7 +95,7 @@ export class SettlementBreakdownProcessor implements ProcessorInterface<
                     ProcessingChannelId: record.ProcessingChannelId,
                     ProcessingChannelName: record.ProcessingChannelName,
                     PayoutId: record.PayoutId,
-                    PayoutDate: this.payoutId,
+                    PayoutDate: this.properties.payoutDate,
                 }
             }
 

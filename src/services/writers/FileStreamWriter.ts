@@ -1,11 +1,11 @@
-import { WriterInterface } from './WriterInterface'
+import { Writer } from './Writer'
 import { promises as fsp } from 'fs'
 import fs from 'fs'
 import { dirname } from 'path'
 import { once } from 'events'
 import { createError } from '../../utils'
 
-export class FileStreamWriter implements WriterInterface {
+export class FileStreamWriter implements Writer {
     private filePath: string
     private tmpFilePath: string
     private stream?: fs.WriteStream

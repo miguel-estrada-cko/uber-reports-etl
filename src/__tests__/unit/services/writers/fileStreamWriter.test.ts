@@ -1,5 +1,5 @@
 import { assertImplementsInterface } from '../../../assertImplementsInterface'
-import { FileStreamWriter, WriterInterface } from '../../../../services'
+import { FileStreamWriter, Writer } from '../../../../services'
 import fs from 'fs'
 import { EventEmitter, once } from 'events'
 
@@ -20,7 +20,7 @@ jest.mock('events', () => {
 })
 
 describe('FileStreamWriter Service', () => {
-    let writer: WriterInterface
+    let writer: Writer
     let mockStream: any
 
     beforeEach(() => {
@@ -40,7 +40,7 @@ describe('FileStreamWriter Service', () => {
     })
 
     it('should implement the interface', () => {
-        expect(assertImplementsInterface<WriterInterface>(writer)).toBeTruthy()
+        expect(assertImplementsInterface<Writer>(writer)).toBeTruthy()
     })
 
     it('should open and create a write stream', async () => {

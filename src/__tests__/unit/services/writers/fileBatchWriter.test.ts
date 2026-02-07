@@ -1,5 +1,5 @@
 import { assertImplementsInterface } from '../../../assertImplementsInterface'
-import { FileBatchWriter, WriterInterface } from '../../../../services'
+import { FileBatchWriter, Writer } from '../../../../services'
 import { promises as fs } from 'fs'
 
 jest.mock('fs', () => ({
@@ -11,7 +11,7 @@ jest.mock('fs', () => ({
 }))
 
 describe('FileBatchWriter Service', () => {
-    let writer: WriterInterface
+    let writer: Writer
 
     beforeEach(() => {
         writer = new FileBatchWriter('test.txt')
@@ -22,7 +22,7 @@ describe('FileBatchWriter Service', () => {
     })
 
     it('should implement the interface', () => {
-        expect(assertImplementsInterface<WriterInterface>(writer)).toBeTruthy()
+        expect(assertImplementsInterface<Writer>(writer)).toBeTruthy()
     })
 
     it('should open successfully', async () => {

@@ -1,10 +1,10 @@
 import { assertImplementsInterface } from '../../../assertImplementsInterface'
-import { CkoSettlementBreakdownCsvMapper, MapperInterface } from '../../../../services/mappers'
+import { CkoSettlementBreakdownCsvMapper, Mapper } from '../../../../services/mappers'
 import { CkoSettlementBreakdownColumnType, CkoSettlementBreakdownRecord } from '../../../../types'
 import { buildSettlementBreakdownRows } from '../../../buildSettlementBreakdownReport'
 
 describe('CkoSettlementBreakdownCsvMapper Service', () => {
-    let mapper: MapperInterface<Record<string, string>, CkoSettlementBreakdownRecord>
+    let mapper: Mapper<Record<string, string>, CkoSettlementBreakdownRecord>
     const payoutId = 'test_abc'
     const payoutDate = new Date()
 
@@ -18,7 +18,7 @@ describe('CkoSettlementBreakdownCsvMapper Service', () => {
 
     it('should implement the interface', () => {
         expect(
-            assertImplementsInterface<MapperInterface<Record<string, string>, CkoSettlementBreakdownRecord>>(mapper)
+            assertImplementsInterface<Mapper<Record<string, string>, CkoSettlementBreakdownRecord>>(mapper)
         ).toBeTruthy()
     })
 

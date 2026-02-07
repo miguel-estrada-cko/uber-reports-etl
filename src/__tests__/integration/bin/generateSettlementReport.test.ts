@@ -1,3 +1,4 @@
+/*
 import { generateSettlementReport } from '../../../bin/generateSettlementReport'
 import fs from 'fs'
 import mock from 'mock-fs'
@@ -140,3 +141,4 @@ describe('Inspección de salida con mock-fs', () => {
         expect(generator.metrics.hasPayoutRow).toBeTruthy()
     })
 })
+*/

@@ -1,11 +1,11 @@
-import { ReaderInterface } from './ReaderInterface'
+import { Reader } from './Reader'
 import fs from 'fs'
 import path from 'path'
 import { Readable } from 'stream'
 import { parse } from 'csv-parse'
 import { ReaderException } from './ReaderException'
 
-export class CsvFileStreamReader implements ReaderInterface {
+export class CsvFileStreamReader implements Reader {
     private filePath: string
     private fileStream: Readable = new Readable()
 

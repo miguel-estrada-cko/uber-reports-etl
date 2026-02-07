@@ -1,4 +1,4 @@
-import { CsvFileStreamReader, ReaderException, ReaderInterface } from '../../../../services/readers'
+import { CsvFileStreamReader, ReaderException, Reader } from '../../../../services/readers'
 import { assertImplementsInterface } from '../../../assertImplementsInterface'
 import fs from 'fs'
 import { Readable } from 'stream'
@@ -6,7 +6,7 @@ import { Readable } from 'stream'
 jest.mock('fs')
 
 describe('CsvFileStreamReader Service', () => {
-    let reader: ReaderInterface
+    let reader: Reader
     const mockFilePath = 'test.csv'
 
     beforeEach(() => {
@@ -18,7 +18,7 @@ describe('CsvFileStreamReader Service', () => {
     })
 
     it('should implement the interface', () => {
-        expect(assertImplementsInterface<ReaderInterface>(reader)).toBeTruthy()
+        expect(assertImplementsInterface<Reader>(reader)).toBeTruthy()
     })
 
     it('should open a file', async () => {

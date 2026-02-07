@@ -1,2 +1,3 @@
 export * from './SettlementBreakdownProcessor'
-export * from './ProcessorInterface'
+export * from './Processor'
+export * from './ProcessorMetrics'

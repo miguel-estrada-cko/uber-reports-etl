@@ -1,11 +1,8 @@
-import { MapperInterface } from './MapperInterface'
+import { Mapper } from './Mapper'
 import { CkoSettlementBreakdownColumnType, CkoSettlementBreakdownRecord } from '../../types'
 import { stringToDate, stringToFloat } from '../../utils'
 
-export class CkoSettlementBreakdownCsvMapper implements MapperInterface<
-    Record<string, string>,
-    CkoSettlementBreakdownRecord
-> {
+export class CkoSettlementBreakdownCsvMapper implements Mapper<Record<string, string>, CkoSettlementBreakdownRecord> {
     map(row: Record<string, string>): CkoSettlementBreakdownRecord {
         return {
             ClientEntityId: row['Client Entity ID'],

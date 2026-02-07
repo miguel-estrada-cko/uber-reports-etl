@@ -1,4 +1,4 @@
-export interface ReaderInterface {
+export interface Reader {
     open(): Promise<boolean>
 
     read(): Promise<AsyncIterable<any>>
